@@ -1,0 +1,82 @@
+group 'com.mygdx.ethanolshared'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'java'
+apply plugin: 'application'
+
+sourceCompatibility = 1.8
+
+sourceSets.main.java.srcDirs = [ "src/" ]
+
+ext {
+    gdxVersion = '1.9.6'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile "com.badlogicgames.gdx:gdx:$gdxVersion"
+    compile "net.dermetfan.libgdx-utils:libgdx-utils:0.10.0"
+    compile "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
+}
+
+javaexec {
+    main = 'com.mygdx.ethanolshared.GenerateAssets'
+    classpath = sourceSets.main.runtimeClasspath
+}
+
+apply plugin: 'maven'
+apply plugin: 'signing'
+
+def myfiles = files('Assets')
+
+artifacts {
+    archives jar
+    archives myfiles
+}
+
+signing {
+    sign configurations.archives
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                authentication(userName: sonatypeUsername, password: sonatypePassword)
+            }
+
+            pom.project {
+                name 'EthanolShared'
+                packaging 'jar'
+                description 'Shared assets for the cup of methanol game and its editor'
+                url 'https://github.com/EoinF/ethanolshared'
+
+                scm {
+                    url 'scm:git@github.com:EoinF/ethanolshared.git'
+                    connection 'scm:git@github.com:EoinF/ethanolshared.git'
+                    developerConnection 'scm:git@github.com:EoinF/ethanolshared.git'
+                }
+
+                licenses {
+                    license {
+                        name 'The Apache Software License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        distribution 'repo'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id 'outterest'
+                        name 'Eoin Flanagan'
+                    }
+                }
+            }
+        }
+    }
+}
