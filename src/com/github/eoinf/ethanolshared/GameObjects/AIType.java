@@ -1,4 +1,4 @@
-package com.mygdx.ethanolshared.GameObjects;
+package com.github.eoinf.ethanolshared.GameObjects;
 
 public enum AIType {
     NONE(0),

@@ -1,4 +1,4 @@
-package com.mygdx.ethanolshared;
+package com.github.eoinf.ethanolshared;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
@@ -7,11 +7,11 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Json;
-import com.mygdx.ethanolshared.GameObjects.Entity;
-import com.mygdx.ethanolshared.GameObjects.GameObject;
-import com.mygdx.ethanolshared.GameObjects.Item;
-import com.mygdx.ethanolshared.GameObjects.Prop;
-import com.mygdx.ethanolshared.GameObjects.TerrainShape;
+import com.github.eoinf.ethanolshared.GameObjects.GameObject;
+import com.github.eoinf.ethanolshared.GameObjects.Prop;
+import com.github.eoinf.ethanolshared.GameObjects.TerrainShape;
+import com.github.eoinf.ethanolshared.GameObjects.Entity;
+import com.github.eoinf.ethanolshared.GameObjects.Item;
 
 import java.util.ArrayList;
 import java.util.Dictionary;

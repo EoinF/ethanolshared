@@ -1,4 +1,4 @@
-package com.mygdx.ethanolshared.GameObjects;
+package com.github.eoinf.ethanolshared.GameObjects;
 
 public enum ItemType {
     PLAYER_SPAWN(0),

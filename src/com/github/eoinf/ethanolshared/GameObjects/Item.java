@@ -1,4 +1,4 @@
-package com.mygdx.ethanolshared.GameObjects;
+package com.github.eoinf.ethanolshared.GameObjects;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
