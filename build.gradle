@@ -1,10 +1,9 @@
 group 'com.github.eoinf.ethanolshared'
-version '1.0-SNAPSHOT'
-
-import org.gradle.api.XmlProvider
+version '1.6-SNAPSHOT'
 
 apply plugin: 'java'
 apply plugin: 'idea'
+apply plugin: 'maven'
 
 sourceCompatibility = 1.8
 
@@ -26,7 +25,7 @@ dependencies {
     compile "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
 }
 
-task('buildAssets', type: JavaExec, dependsOn: classes) {
+task('buildAssets', type: JavaExec, dependsOn: 'classes') {
     main = 'com.github.eoinf.ethanolshared.GenerateAssets'
     classpath = sourceSets.main.runtimeClasspath
 }
@@ -34,53 +33,53 @@ task('buildAssets', type: JavaExec, dependsOn: classes) {
 task('dist', type: Jar, dependsOn: 'buildAssets') {
     from files(sourceSets.main.output.classesDir)
     from files(sourceSets.main.output.resourcesDir)
-    from { configurations.compile.collect { zipTree(it) } }
     from files(project.assetsDir)
+
+    // Skip the creation of the default jar artifact
+    jar.enabled = false
 }
 
-task ('releaseSnapshot', dependsOn: 'dist') {
+task('archiveDist', dependsOn: 'dist') {
     doLast {
-        apply plugin: 'maven'
-
-        artifacts {
-            archives jar
+        project.configurations.archives.artifacts.clear()
+        project.artifacts {
+            archives dist
         }
+    }
+}
 
-        uploadArchives {
-            repositories {
-                mavenDeployer {
-                    //beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+task('releaseSnapshot', type: Upload, dependsOn: 'archiveDist') {
+    repositories {
+        configuration = project.configurations.archives
+        mavenDeployer {
+            repository(url: "https://oss.sonatype.org/content/repositories/snapshots") {
+                authentication(userName: sonatypeUsername, password: sonatypePassword)
+            }
 
-                    repository(url: "https://oss.sonatype.org/content/repositories/snapshots") {
-                        authentication(userName: sonatypeUsername, password: sonatypePassword)
+            pom.project {
+                name 'EthanolShared'
+                packaging 'jar'
+                description 'Shared assets for the cup of methanol game and its editor'
+                url 'https://github.com/EoinF/ethanolshared'
+
+                scm {
+                    url 'scm:git@github.com:EoinF/ethanolshared.git'
+                    connection 'scm:git@github.com:EoinF/ethanolshared.git'
+                    developerConnection 'scm:git@github.com:EoinF/ethanolshared.git'
+                }
+
+                licenses {
+                    license {
+                        name 'The Apache Software License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        distribution 'repo'
                     }
+                }
 
-                    pom.project {
-                        name 'EthanolShared'
-                        packaging 'jar'
-                        description 'Shared assets for the cup of methanol game and its editor'
-                        url 'https://github.com/EoinF/ethanolshared'
-
-                        scm {
-                            url 'scm:git@github.com:EoinF/ethanolshared.git'
-                            connection 'scm:git@github.com:EoinF/ethanolshared.git'
-                            developerConnection 'scm:git@github.com:EoinF/ethanolshared.git'
-                        }
-
-                        licenses {
-                            license {
-                                name 'The Apache Software License, Version 2.0'
-                                url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                                distribution 'repo'
-                            }
-                        }
-
-                        developers {
-                            developer {
-                                id 'outterest'
-                                name 'Eoin Flanagan'
-                            }
-                        }
+                developers {
+                    developer {
+                        id 'outterest'
+                        name 'Eoin Flanagan'
                     }
                 }
             }

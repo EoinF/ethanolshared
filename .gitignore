@@ -64,4 +64,5 @@ build/
 .DS_Store
 
 ## Other
-Assets
+assets/*
+!assets/textures
