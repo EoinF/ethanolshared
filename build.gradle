@@ -1,9 +1,12 @@
 group 'com.github.eoinf.ethanolshared'
-version '1.6-SNAPSHOT'
+version '1.8'
+
+import org.gradle.api.artifacts.maven.MavenDeployment
 
 apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: 'maven'
+apply plugin: 'signing'
 
 sourceCompatibility = 1.8
 
@@ -30,6 +33,22 @@ task('buildAssets', type: JavaExec, dependsOn: 'classes') {
     classpath = sourceSets.main.runtimeClasspath
 }
 
+javadoc {
+    source = sourceSets.main.allJava
+    classpath = configurations.compile
+}
+
+task ('javadocJar', type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from tasks.javadoc.destinationDir
+}
+
+task ('sourcesJar', type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+
 task('dist', type: Jar, dependsOn: 'buildAssets') {
     from files(sourceSets.main.output.classesDir)
     from files(sourceSets.main.output.resourcesDir)
@@ -39,20 +58,39 @@ task('dist', type: Jar, dependsOn: 'buildAssets') {
     jar.enabled = false
 }
 
-task('archiveDist', dependsOn: 'dist') {
+
+task('archiveAll') {
+    dependsOn 'dist'
+    dependsOn 'sourcesJar'
+    dependsOn 'javadocJar'
     doLast {
-        project.configurations.archives.artifacts.clear()
         project.artifacts {
             archives dist
+            archives sourcesJar
+            archives javadocJar
         }
     }
 }
 
-task('releaseSnapshot', type: Upload, dependsOn: 'archiveDist') {
+task('publishLocal', type: Upload, dependsOn: 'archiveAll') {
+    repositories {
+        configuration = project.configurations.archives
+        mavenLocal()
+    }
+}
+
+signing {
+    sign project.configurations.archives
+}
+
+task('publishStaging', type: Upload, dependsOn: 'archiveAll') {
     repositories {
         configuration = project.configurations.archives
         mavenDeployer {
-            repository(url: "https://oss.sonatype.org/content/repositories/snapshots") {
+            //def ascPom = addFilter('asc') {artifact, file -> artifact.ext == "asc" }
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
                 authentication(userName: sonatypeUsername, password: sonatypePassword)
             }
 

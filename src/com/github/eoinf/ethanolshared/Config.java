@@ -13,6 +13,7 @@ import com.github.eoinf.ethanolshared.GameObjects.TerrainShape;
 import com.github.eoinf.ethanolshared.GameObjects.Entity;
 import com.github.eoinf.ethanolshared.GameObjects.Item;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Hashtable;
@@ -30,7 +31,6 @@ public class Config {
     public TextureAtlas atlas;
 
     public String atlasFileName;
-    public String texturesFilePath;
 
     //Default Constructor for json deserialization
     public Config() {}
@@ -43,7 +43,8 @@ public class Config {
         //
         //Load the texture atlas for each sprite
         //
-        config.atlas = new TextureAtlas(Gdx.files.internal(config.atlasFileName));
+        FileHandle f = Gdx.files.internal(config.atlasFileName);
+        config.atlas = new TextureAtlas(f);
         TextureAtlas.AtlasRegion[] atlasRegionList = config.atlas.getRegions().toArray(TextureAtlas.AtlasRegion.class);
         config.spriteNames = new String[atlasRegionList.length];
 
@@ -64,15 +65,17 @@ public class Config {
         config.baseEntityNames = idleSpriteNamesList.toArray(new String[idleSpriteNamesList.size()]);
         config.baseItemNames = activeSpriteNamesList.toArray(new String[activeSpriteNamesList.size()]);
 
+
+        config.textureNames = Gdx.files.internal("textureNames.txt").readString()
+                        .split(",");
+
         //
         //Get the list of texture files and their names
         //
-        FileHandle[] textureFiles = Gdx.files.internal(config.texturesFilePath).list();
-        config.textureNames = new String[textureFiles.length];
-        config.textureValues = new Texture[textureFiles.length];
-        for (int i = 0; i < textureFiles.length; i++) {
-            config.textureNames[i] = textureFiles[i].nameWithoutExtension();
-            config.textureValues[i] = new Texture(textureFiles[i]);
+        config.textureValues = new Texture[config.textureNames.length];
+        for (int i = 0; i < config.textureNames.length; i++) {
+            FileHandle current = Gdx.files.internal("textures/" + config.textureNames[i] + ".png");
+            config.textureValues[i] = new Texture(current);
         }
 
         config.textureMap = new Hashtable<>();
