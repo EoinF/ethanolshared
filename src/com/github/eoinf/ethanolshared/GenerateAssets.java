@@ -1,7 +1,5 @@
 package com.github.eoinf.ethanolshared;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.tools.texturepacker.TexturePacker;
 
 import java.io.File;
